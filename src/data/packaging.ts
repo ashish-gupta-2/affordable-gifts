@@ -1,4 +1,4 @@
-import { Packaging } from "../types";
+import type { Packaging } from "../types";
 
 export const packagingOptions: Packaging[] = [
   {

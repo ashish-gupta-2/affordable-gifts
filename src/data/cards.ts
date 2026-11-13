@@ -1,4 +1,4 @@
-import { GreetingCard } from "../types";
+import type { GreetingCard } from "../types";
 
 export const greetingCards: GreetingCard[] = [
   {

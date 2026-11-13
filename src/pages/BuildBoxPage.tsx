@@ -1,3 +1,5 @@
+import ProductCatalog from "../components/ProductCatalog";
+
 export default function BuildBoxPage() {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -14,9 +16,7 @@ export default function BuildBoxPage() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-8">
-        <div className="rounded-lg bg-white p-6 shadow">
-          Phase 1 development started 🚀
-        </div>
+        <ProductCatalog />
       </main>
     </div>
   );
