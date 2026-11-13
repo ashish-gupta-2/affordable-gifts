@@ -5,6 +5,8 @@ interface Props {
   totalPrice: number;
   totalWeight: number;
   remainingAmount: number;
+  onAdd: (product: CartItem["product"]) => void;
+  onRemove: (productId: string) => void;
 }
 
 export default function OrderSummary({
@@ -12,49 +14,87 @@ export default function OrderSummary({
   totalPrice,
   totalWeight,
   remainingAmount,
+  onAdd,
+  onRemove,
 }: Props) {
   return (
-    <div className="sticky top-6 rounded-xl bg-white p-6 shadow">
+    <div className="rounded-xl bg-white p-6 shadow">
       <h2 className="mb-4 text-xl font-bold">
         Order Summary
       </h2>
 
-      <div className="space-y-2">
-        {items.map((item) => (
-          <div
-            key={item.product.id}
-            className="flex justify-between"
-          >
-            <span>
-              {item.product.name} x {item.quantity}
-            </span>
+      {items.length === 0 ? (
+        <p className="text-gray-500">
+          No products added yet
+        </p>
+      ) : (
+        <div className="space-y-3">
+            {items.map((item) => (
+                <div
+                key={item.product.id}
+                className="rounded-lg border p-3"
+                >
+                <div className="flex justify-between">
+                    <span className="font-medium">
+                    {item.product.name}
+                    </span>
 
-            <span>
-              ₹
-              {item.product.price *
-                item.quantity}
-            </span>
-          </div>
-        ))}
-      </div>
+                    <span>
+                    ₹
+                    {item.product.price *
+                        item.quantity}
+                    </span>
+                </div>
+
+                <div className="mt-2 flex items-center gap-2">
+                    <button
+                    onClick={() =>
+                        onRemove(item.product.id)
+                    }
+                    className="h-8 w-8 rounded bg-red-500 text-white"
+                    >
+                    -
+                    </button>
+
+                    <span className="w-8 text-center">
+                    {item.quantity}
+                    </span>
+
+                    <button
+                    onClick={() =>
+                        onAdd(item.product)
+                    }
+                    className="h-8 w-8 rounded bg-green-600 text-white"
+                    >
+                    +
+                    </button>
+                </div>
+                </div>
+            ))}
+        </div>
+      )}
 
       <hr className="my-4" />
 
-      <p>Total Weight: {totalWeight}g</p>
+      <div className="space-y-2">
+        <p>
+          Total Weight: <b>{totalWeight}g</b>
+        </p>
 
-      <p className="font-bold">
-        Total Price: ₹{totalPrice}
-      </p>
+        <p>
+          Total Price: <b>₹{totalPrice}</b>
+        </p>
+      </div>
 
       {remainingAmount > 0 ? (
-        <p className="mt-3 text-sm text-red-600">
-          Add ₹{remainingAmount} more to reach
-          minimum order value.
-        </p>
+        <div className="mt-4 rounded-lg bg-red-50 p-3 text-red-600">
+          Add ₹{remainingAmount} more to
+          reach the minimum order value.
+        </div>
       ) : (
-        <p className="mt-3 text-green-600">
+        <div className="mt-4 rounded-lg bg-green-50 p-3 text-green-700">
           Minimum order reached ✅
-        </p>
+        </div>
       )}
     </div>
   );

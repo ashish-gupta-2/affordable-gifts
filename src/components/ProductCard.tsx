@@ -10,9 +10,11 @@ export default function ProductCard({
   onAdd,
 }: Props) {
   return (
-    <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-      <div className="flex h-40 items-center justify-center bg-gray-100">
-        Product Image
+    <div className="overflow-hidden rounded-xl border bg-white shadow-sm hover:shadow-md">
+      <div className="mt-3 flex items-center justify-between">
+        <span className="text-gray-400">
+          Product Image
+        </span>
       </div>
 
       <div className="p-4">
@@ -24,16 +26,21 @@ export default function ProductCard({
           {product.category}
         </p>
 
-        <div className="mt-2 flex justify-between">
-          <span>₹{product.price}</span>
-          <span>{product.weight}g</span>
+        <div className="mt-3 flex justify-between">
+          <span className="font-bold text-green-700">
+            ₹{product.price}
+          </span>
+
+          <span className="text-gray-500">
+            {product.weight}g
+          </span>
         </div>
 
         <button
           onClick={() => onAdd(product)}
-          className="mt-4 w-full rounded-lg bg-green-600 py-2 text-white"
+          className="mt-4 w-full rounded-lg bg-green-600 py-2 text-white hover:bg-green-700"
         >
-          Add to Box
+          Add To Box
         </button>
       </div>
     </div>

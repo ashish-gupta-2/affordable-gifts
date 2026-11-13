@@ -23,40 +23,50 @@ export function useGiftBuilder() {
         );
       }
 
-      return [...current, { product, quantity: 1 }];
+      return [
+        ...current,
+        {
+          product,
+          quantity: 1,
+        },
+      ];
     });
   };
 
   const removeProduct = (productId: string) => {
     setItems((current) =>
-      current
+        current
         .map((item) =>
-          item.product.id === productId
+            item.product.id === productId
             ? {
                 ...item,
                 quantity: item.quantity - 1,
-              }
+                }
             : item
         )
         .filter((item) => item.quantity > 0)
-    );
-  };
+      );
+    };
 
-  const totalPrice = useMemo(() => {
-    return items.reduce(
-      (sum, item) =>
-        sum + item.product.price * item.quantity,
-      0
-    );
-  }, [items]);
+  const totalPrice = useMemo(
+    () =>
+      items.reduce(
+        (sum, item) =>
+          sum + item.product.price * item.quantity,
+        0
+      ),
+    [items]
+  );
 
-  const totalWeight = useMemo(() => {
-    return items.reduce(
-      (sum, item) =>
-        sum + item.product.weight * item.quantity,
-      0
-    );
-  }, [items]);
+  const totalWeight = useMemo(
+    () =>
+      items.reduce(
+        (sum, item) =>
+          sum + item.product.weight * item.quantity,
+        0
+      ),
+    [items]
+  );
 
   const remainingAmount = Math.max(
     0,
