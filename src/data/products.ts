@@ -7,7 +7,7 @@ export const products: Product[] = [
     category: "Dry Fruits",
     weight: 50,
     price: 55,
-    image: "/images/almonds.jpg",
+    emoji: "🌰",
   },
   {
     id: "cashews",
@@ -15,7 +15,7 @@ export const products: Product[] = [
     category: "Dry Fruits",
     weight: 50,
     price: 65,
-    image: "/images/cashews.jpg",
+    emoji: "🥜",
   },
   {
     id: "raisins",
@@ -23,7 +23,7 @@ export const products: Product[] = [
     category: "Dry Fruits",
     weight: 50,
     price: 30,
-    image: "/images/raisins.jpg",
+    emoji: "🍇",
   },
   {
     id: "roasted-moong",
@@ -31,7 +31,7 @@ export const products: Product[] = [
     category: "Snacks",
     weight: 50,
     price: 20,
-    image: "/images/moong.jpg",
+    emoji: "🫘",
   },
   {
     id: "roasted-chana",
@@ -39,6 +39,6 @@ export const products: Product[] = [
     category: "Snacks",
     weight: 50,
     price: 15,
-    image: "/images/chana.jpg",
+    emoji: "🧆",
   },
 ];

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { CartItem, Product } from "../types";
 
-const MIN_ORDER_VALUE = 299;
+export const MIN_ORDER_VALUE = 299;
 
 export function useGiftBuilder() {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -35,18 +35,18 @@ export function useGiftBuilder() {
 
   const removeProduct = (productId: string) => {
     setItems((current) =>
-        current
+      current
         .map((item) =>
-            item.product.id === productId
+          item.product.id === productId
             ? {
                 ...item,
                 quantity: item.quantity - 1,
-                }
+              }
             : item
         )
         .filter((item) => item.quantity > 0)
-      );
-    };
+    );
+  };
 
   const totalPrice = useMemo(
     () =>

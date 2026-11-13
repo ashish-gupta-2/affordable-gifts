@@ -4,7 +4,7 @@ export interface Product {
   category: "Dry Fruits" | "Snacks";
   weight: number;
   price: number;
-  image: string;
+  emoji: string;
 }
 
 export interface Packaging {
