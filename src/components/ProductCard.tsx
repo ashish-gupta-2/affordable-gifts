@@ -2,38 +2,36 @@ import type { Product } from "../types";
 
 interface Props {
   product: Product;
+  onAdd: (product: Product) => void;
 }
 
-export default function ProductCard({ product }: Props) {
+export default function ProductCard({
+  product,
+  onAdd,
+}: Props) {
   return (
-    <div className="overflow-hidden rounded-xl border bg-white shadow-sm transition hover:shadow-md">
+    <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
       <div className="flex h-40 items-center justify-center bg-gray-100">
-        <span className="text-gray-400">
-          Product Image
-        </span>
+        Product Image
       </div>
 
       <div className="p-4">
-        <h3 className="font-semibold text-gray-900">
+        <h3 className="font-semibold">
           {product.name}
         </h3>
 
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="text-sm text-gray-500">
           {product.category}
         </p>
 
-        <div className="mt-2 flex items-center justify-between">
-          <span className="font-bold text-green-700">
-            ₹{product.price}
-          </span>
-
-          <span className="text-sm text-gray-500">
-            {product.weight}g
-          </span>
+        <div className="mt-2 flex justify-between">
+          <span>₹{product.price}</span>
+          <span>{product.weight}g</span>
         </div>
 
         <button
-          className="mt-4 w-full rounded-lg bg-green-600 py-2 text-white hover:bg-green-700"
+          onClick={() => onAdd(product)}
+          className="mt-4 w-full rounded-lg bg-green-600 py-2 text-white"
         >
           Add to Box
         </button>
