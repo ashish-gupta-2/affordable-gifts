@@ -1,13 +1,19 @@
 import type { Product } from "../types";
-import { products } from "../data/products";
 import ProductCard from "./ProductCard";
 
 interface Props {
+  products: Product[];
+  /** Pack size (g) of the selected packaging's slots, if any. */
+  slotCapacity: number | null;
   onAdd: (product: Product) => void;
+  getAddBlockReason: (product: Product) => string | null;
 }
 
 export default function ProductCatalog({
+  products,
+  slotCapacity,
   onAdd,
+  getAddBlockReason,
 }: Props) {
   return (
     <section>
@@ -26,7 +32,9 @@ export default function ProductCatalog({
           <ProductCard
             key={product.id}
             product={product}
+            slotCapacity={slotCapacity}
             onAdd={onAdd}
+            blockReason={getAddBlockReason(product)}
           />
         ))}
       </div>
