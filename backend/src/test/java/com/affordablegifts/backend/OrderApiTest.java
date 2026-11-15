@@ -116,6 +116,58 @@ class OrderApiTest {
         place(sneaky).andExpect(status().isCreated()).andExpect(jsonPath("$.total").value(590.00));
     }
 
+    private static String withCover(String body, String coverId) {
+        return body.replaceFirst("\\{", "{\"coverId\":\"" + coverId + "\",");
+    }
+
+    @Test
+    void jarSetOrderPaysForJarsPlusTheChosenCover() throws Exception {
+        jdbc.update("insert into packaging_options (id,name,kind,description,price,slot_count,slot_capacity)"
+                + " values ('jar-100','100g Jars','jar','d',20.00,3,100)");
+        jdbc.update("insert into packaging_options (id,name,kind,description,price,slot_count,slot_capacity)"
+                + " values ('cover-wood','Wooden Cover','cover','d',15.00,3,100),"
+                + "        ('cover-gold','Gold Cover','cover','d',25.00,3,100)");
+        String body = order("r-jar", "jar-100", 1, "[\"almonds\",\"cashews\",\"almonds\"]", "560001");
+
+        // products 110+130+110 = 350; packaging 3 x 20 + 25 = 85; local delivery 50 => 485
+        place(withCover(body, "cover-gold"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.packagingName").value("100g Jars + Gold Cover"))
+                .andExpect(jsonPath("$.packagingTotal").value(85.00))
+                .andExpect(jsonPath("$.total").value(485.00));
+
+        // A different cover gives a different price (another order, so another request id).
+        String body2 = order("r-jar-b", "jar-100", 2, "[\"almonds\",\"cashews\",\"almonds\"]", "560001");
+        place(withCover(body2, "cover-wood"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.packagingTotal").value(150.00)); // (60 + 15) x 2
+    }
+
+    @Test
+    void jarSetOrdersNeedAValidCoverAndBoxesTakeNone() throws Exception {
+        jdbc.update("insert into packaging_options (id,name,kind,description,price,slot_count,slot_capacity)"
+                + " values ('jar-100','100g Jars','jar','d',20.00,3,100)");
+        jdbc.update("insert into packaging_options (id,name,kind,description,price,slot_count,slot_capacity,active)"
+                + " values ('cover-wood','Wooden Cover','cover','d',15.00,3,100,true),"
+                + "        ('cover-off','Old Cover','cover','d',5.00,3,100,false),"
+                + "        ('cover-200','Big Cover','cover','d',15.00,2,200,true)");
+        String jars = order("r-c1", "jar-100", 1, "[\"almonds\",\"cashews\",\"almonds\"]", "560001");
+
+        place(jars).andExpect(status().isBadRequest());                              // no cover chosen
+        place(withCover(jars, "cover-off")).andExpect(status().isBadRequest());      // switched off
+        place(withCover(jars, "cover-200")).andExpect(status().isBadRequest());      // wrong size
+        place(withCover(jars, "box-2")).andExpect(status().isBadRequest());         // not a cover
+        place(withCover(jars, "nope")).andExpect(status().isBadRequest());           // unknown
+
+        // A cover is not something you can order as the main packaging.
+        place(order("r-c2", "cover-wood", 1, "[\"almonds\",\"cashews\",\"almonds\"]", "560001"))
+                .andExpect(status().isNotFound());
+        // A box does not take a cover.
+        place(withCover(order("r-c3", "box-2", 1, "[\"almonds\",\"cashews\"]", "560001"), "cover-wood"))
+                .andExpect(status().isBadRequest());
+        assertEquals(0, orderCount());
+    }
+
     // --------------------------------------------------------- idempotency
 
     @Test

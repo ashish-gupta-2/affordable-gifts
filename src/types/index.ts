@@ -18,9 +18,9 @@ export interface Product {
 export interface Packaging {
   id: string;
   name: string;
-  kind: "box" | "jar";
+  kind: "box" | "jar" | "cover";
   description: string;
-  /** Total packaging cost (box, or jars + outer cover). */
+  /** Per box, per jar (jars), or per cover. A jar set costs jars x price + its cover. */
   price: number;
   /** Number of partitions (box) or jars (jar set). */
   slotCount: number;

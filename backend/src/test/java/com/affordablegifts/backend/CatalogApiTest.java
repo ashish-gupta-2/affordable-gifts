@@ -224,9 +224,31 @@ class CatalogApiTest {
 
         mvc.perform(admin(post("/api/admin/packaging"), jar.formatted("jar-bad", 2, 300)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("A jar set must be 2 x 200g jars or 3 x 100g jars"));
+                .andExpect(jsonPath("$.detail").value("Glass jars and covers must be 3 x 100g or 2 x 200g"));
         mvc.perform(admin(post("/api/admin/packaging"), jar.formatted("jar-bad2", 4, 100)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void severalCoversCanExistForTheSameJarLayoutAndAllAreListedForCustomers() throws Exception {
+        String cover = """
+                {"id":"%s","name":"%s","kind":"cover","description":"d","price":%d,
+                 "slotCount":%d,"slotCapacity":%d}""";
+        mvc.perform(admin(post("/api/admin/packaging"), cover.formatted("cover-a", "Wooden Cover", 15, 3, 100)))
+                .andExpect(status().isCreated());
+        mvc.perform(admin(post("/api/admin/packaging"), cover.formatted("cover-b", "Gold Cover", 25, 3, 100)))
+                .andExpect(status().isCreated());
+        mvc.perform(admin(post("/api/admin/packaging"), cover.formatted("cover-c", "Steel Cover", 30, 2, 200)))
+                .andExpect(status().isCreated());
+
+        // Covers only come in the two standard layouts.
+        mvc.perform(admin(post("/api/admin/packaging"), cover.formatted("cover-bad", "Bad", 9, 4, 100)))
+                .andExpect(status().isBadRequest());
+
+        mvc.perform(get("/api/packaging"))
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[?(@.id=='cover-b')].kind").value("cover"))
+                .andExpect(jsonPath("$[?(@.id=='cover-b')].price").value(25.00));
     }
 
     @Test

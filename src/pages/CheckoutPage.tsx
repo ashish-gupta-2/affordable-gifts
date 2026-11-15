@@ -41,7 +41,7 @@ export default function CheckoutPage({
   // returns the same order instead of creating a duplicate.
   const requestId = useRef(crypto.randomUUID());
 
-  const { selectedPackaging, packagingQuantity, slots } = builder;
+  const { selectedPackaging, selectedCover, packagingQuantity, slots } = builder;
 
   useEffect(() => {
     if (!/^[1-9][0-9]{5}$/.test(details.pincode)) return;
@@ -80,6 +80,7 @@ export default function CheckoutPage({
       const order = await placeOrder({
         requestId: requestId.current,
         packagingId: selectedPackaging.id,
+        coverId: selectedCover?.id,
         quantity: packagingQuantity,
         productIds: slots.map((slot) => slot?.product.id ?? ""),
         details,

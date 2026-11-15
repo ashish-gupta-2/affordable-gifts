@@ -19,6 +19,10 @@ public class PackagingService {
         this.repository = repository;
     }
 
+    /**
+     * Everything the customer can pick from: boxes, jars (priced per jar) and covers.
+     * The storefront offers a cover only after the customer picked jars it fits.
+     */
     @Transactional(readOnly = true)
     public List<PackagingResponse> listActive() {
         return repository.findByActiveTrueOrderByDisplayOrderAscNameAsc().stream()
@@ -66,19 +70,16 @@ public class PackagingService {
                 .orElseThrow(() -> new NotFoundException("Packaging '" + id + "' not found"));
     }
 
-    /**
-     * Jar sets sit in one outer cover that holds either two 200g jars or
-     * three 100g jars; anything else cannot physically fit.
-     */
+    /** Jar sets sit in one outer cover; jars and covers come in exactly two standard layouts. */
     private static void validateJarCover(PackagingKind kind, int slotCount, int slotCapacity) {
-        if (kind != PackagingKind.JAR) {
+        if (kind == PackagingKind.BOX) {
             return;
         }
         boolean twoByTwoHundred = slotCount == 2 && slotCapacity == 200;
         boolean threeByHundred = slotCount == 3 && slotCapacity == 100;
         if (!twoByTwoHundred && !threeByHundred) {
             throw new IllegalArgumentException(
-                    "A jar set must be 2 x 200g jars or 3 x 100g jars");
+                    "Glass jars and covers must be 3 x 100g or 2 x 200g");
         }
     }
 }

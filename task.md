@@ -46,7 +46,7 @@ Move an item from **Pending** to **Done** (`[ ]` → `[x]`) when it is finished 
 - [x] Idempotent checkout via `requestId` (retry returns the same order)
 - [x] Order numbers (`AG-1001`…), items stored per slot
 - [x] Order confirmation email via Gmail SMTP (sent after commit, never breaks an order; see `EMAIL.md`)
-- [x] Tests: 58 passing (catalogue, orders, admin console, email, security)
+- [x] Tests: 61 passing (catalogue, orders, admin console, email, security, images, health)
 - [x] Lombok annotation processor declared in `pom.xml` (needed on JDK 23+; a clean build had been failing)
 
 ### Product and packaging photos (see `IMAGES.md`)
@@ -54,6 +54,16 @@ Move an item from **Pending** to **Done** (`[ ]` → `[x]`) when it is finished 
 - [x] Photos stored in Postgres (`images` table) and served at `/api/images/{id}`, cached for a year
 - [x] Only real JPEG / PNG / WebP up to 1 MB (SVG refused); photo URLs limited to our own uploads
 - [x] Storefront cards, packaging cards and cart show the photo; the emoji is now an optional fallback
+
+### Glass jar covers
+- [x] New packaging type "Glass jar cover": its own priced item in two standard layouts (3 x 100g or 2 x 200g)
+- [x] Storefront shows a "Glass Jars Cover" group (red *) only after jars are chosen, listing only covers that fit those jars
+- [x] Several covers per layout are allowed; the customer picks one. Checkout stays disabled until a cover is chosen
+- [x] A jar set costs (price per jar x number of jars) + the chosen cover; the order stores the combined price and the name "Jar + Cover"
+- [x] The server re-checks the cover (active, right layout, only for jars); covers cannot be ordered alone
+- [x] Admin shows a "Fits" picker for jars and covers instead of free numbers
+- [x] Checked in headless Chrome: 3 x Rs 20 + Rs 20 = Rs 80, with the Gold cover Rs 95; order placed and shown as "Jar + Cover"
+- [x] Migration V4 turned existing jar prices into per-jar prices and added two covers at Rs 0 (set real cover prices in /admin)
 
 ### Security (see `SECURITY.md`)
 - [x] Security headers, `no-store` on admin/order responses, no server banner

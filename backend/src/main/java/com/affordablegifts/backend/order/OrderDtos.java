@@ -45,6 +45,8 @@ public final class OrderDtos {
                     message = "must be a UUID")
             String requestId,
             @NotBlank String packagingId,
+            /** Only for glass jars: which outer cover goes with them. */
+            @Size(max = 64) String coverId,
             @NotNull @Min(1) @Max(50) Integer quantity,
             @NotEmpty @Size(max = 20) List<@NotBlank String> productIds,
             @NotNull @Valid CustomerRequest customer,

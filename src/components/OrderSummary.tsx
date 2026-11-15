@@ -4,6 +4,10 @@ import type { Slot } from "../hooks/useGiftBuilder";
 
 interface Props {
   selectedPackaging: Packaging | null;
+  selectedCover: Packaging | null;
+  needsCover: boolean;
+  /** One box, or one jar set including its cover. */
+  setPackagingPrice: number;
   packagingQuantity: number;
   packagingPrice: number;
   onIncreasePackaging: () => void;
@@ -21,6 +25,9 @@ interface Props {
 
 export default function OrderSummary({
   selectedPackaging,
+  selectedCover,
+  needsCover,
+  setPackagingPrice,
   packagingQuantity,
   packagingPrice,
   onIncreasePackaging,
@@ -114,9 +121,13 @@ export default function OrderSummary({
             <span>{selectedPackaging.name}</span>
             <span>₹{packagingPrice}</span>
           </div>
+          {selectedCover && <p className="text-sm">+ {selectedCover.name}</p>}
           <p className="text-sm text-gray-500">
-            ₹{selectedPackaging.price} each
+            ₹{setPackagingPrice} each{needsCover && selectedCover ? " (jars + cover)" : ""}
           </p>
+          {needsCover && !selectedCover && (
+            <p className="text-sm text-amber-700">Choose a glass jar cover</p>
+          )}
 
           <div className="mt-3 flex items-center gap-3">
             <button

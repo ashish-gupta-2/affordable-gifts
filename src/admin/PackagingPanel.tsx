@@ -48,6 +48,24 @@ function toForm(p: AdminPackaging): FormState {
   };
 }
 
+/** Glass jars and their covers only come in these two layouts. */
+const JAR_LAYOUTS = [
+  { value: "3x100", label: "3 jars × 100g", slotCount: 3, slotCapacity: 100 },
+  { value: "2x200", label: "2 jars × 200g", slotCount: 2, slotCapacity: 200 },
+];
+
+const KIND_LABELS: Record<AdminPackaging["kind"], string> = {
+  box: "Gift box",
+  jar: "Glass jars",
+  cover: "Glass jar cover",
+};
+
+const PRICE_LABELS: Record<AdminPackaging["kind"], string> = {
+  box: "Price (₹)",
+  jar: "Price per jar (₹)",
+  cover: "Cover price (₹)",
+};
+
 function PackagingForm({
   api,
   editing,
@@ -63,6 +81,21 @@ function PackagingForm({
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((current) => ({ ...current, [key]: value }));
+
+  // Jars and covers have two fixed layouts; switching to one fills the numbers in.
+  const changeKind = (kind: FormState["kind"]) =>
+    setForm((current) => {
+      if (kind === "box") return { ...current, kind };
+      const known = JAR_LAYOUTS.some(
+        (l) => String(l.slotCount) === current.slotCount && String(l.slotCapacity) === current.slotCapacity
+      );
+      const layout = known ? null : JAR_LAYOUTS[0];
+      return {
+        ...current,
+        kind,
+        ...(layout && { slotCount: String(layout.slotCount), slotCapacity: String(layout.slotCapacity) }),
+      };
+    });
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -114,9 +147,10 @@ function PackagingForm({
         </label>
         <label className="block">
           <span className="mb-1 block text-sm font-medium">Type</span>
-          <select className={inputClass} value={form.kind} onChange={(e) => set("kind", e.target.value as FormState["kind"])}>
+          <select className={inputClass} value={form.kind} onChange={(e) => changeKind(e.target.value as FormState["kind"])}>
             <option value="box">Gift box</option>
-            <option value="jar">Glass jar set</option>
+            <option value="jar">Glass jars</option>
+            <option value="cover">Glass jar cover</option>
           </select>
         </label>
         <label className="block md:col-span-2">
@@ -124,17 +158,39 @@ function PackagingForm({
           <input required maxLength={200} className={inputClass} value={form.description} onChange={(e) => set("description", e.target.value)} />
         </label>
         <label className="block">
-          <span className="mb-1 block text-sm font-medium">Price (₹)</span>
+          <span className="mb-1 block text-sm font-medium">{PRICE_LABELS[form.kind]}</span>
           <input required type="number" min="0" step="0.01" className={inputClass} value={form.price} onChange={(e) => set("price", e.target.value)} />
         </label>
-        <label className="block">
-          <span className="mb-1 block text-sm font-medium">Partitions / jars</span>
-          <input required type="number" min="1" className={inputClass} value={form.slotCount} onChange={(e) => set("slotCount", e.target.value)} />
-        </label>
-        <label className="block">
-          <span className="mb-1 block text-sm font-medium">Grams per slot</span>
-          <input required type="number" min="1" className={inputClass} value={form.slotCapacity} onChange={(e) => set("slotCapacity", e.target.value)} />
-        </label>
+        {form.kind === "box" ? (
+          <>
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium">Partitions</span>
+              <input required type="number" min="1" className={inputClass} value={form.slotCount} onChange={(e) => set("slotCount", e.target.value)} />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium">Grams per partition</span>
+              <input required type="number" min="1" className={inputClass} value={form.slotCapacity} onChange={(e) => set("slotCapacity", e.target.value)} />
+            </label>
+          </>
+        ) : (
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium">Fits</span>
+            <select
+              className={inputClass}
+              value={`${form.slotCount}x${form.slotCapacity}`}
+              onChange={(e) => {
+                const layout = JAR_LAYOUTS.find((l) => l.value === e.target.value);
+                if (layout) {
+                  setForm((c) => ({ ...c, slotCount: String(layout.slotCount), slotCapacity: String(layout.slotCapacity) }));
+                }
+              }}
+            >
+              {JAR_LAYOUTS.map((l) => (
+                <option key={l.value} value={l.value}>{l.label}</option>
+              ))}
+            </select>
+          </label>
+        )}
         <ImageField api={api} value={form.imageUrl} onChange={(url) => set("imageUrl", url)} />
         <label className="block">
           <span className="mb-1 block text-sm font-medium">Display order</span>
@@ -147,9 +203,12 @@ function PackagingForm({
           </label>
         )}
       </div>
-      <p className="text-xs text-gray-500">
-        A jar set must be 2 jars of 200g or 3 jars of 100g (they fit one outer cover).
-      </p>
+      {form.kind !== "box" && (
+        <p className="text-xs text-gray-500">
+          A jar set costs (price per jar × number of jars) + the cover the customer picks. Add as many
+          covers as you like for each layout; customers choose one after choosing their jars.
+        </p>
+      )}
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
       <div className="flex gap-3">
         <button type="submit" disabled={saving} className={primaryButton}>
@@ -248,11 +307,14 @@ export default function PackagingPanel({ api }: { api: AdminApi }) {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3">{item.kind === "box" ? "Gift box" : "Glass jars"}</td>
+                  <td className="px-4 py-3">{KIND_LABELS[item.kind]}</td>
                   <td className="px-4 py-3">
                     {item.slotCount} × {item.slotCapacity}g
                   </td>
-                  <td className="px-4 py-3">{formatRupees(item.price)}</td>
+                  <td className="px-4 py-3">
+                    {formatRupees(item.price)}
+                    {item.kind === "jar" && <span className="text-xs text-gray-400"> per jar</span>}
+                  </td>
                   <td className="px-4 py-3">{item.displayOrder}</td>
                   <td className="px-4 py-3">{item.active ? "Visible" : "Hidden"}</td>
                   <td className="space-x-2 px-4 py-3 text-right">

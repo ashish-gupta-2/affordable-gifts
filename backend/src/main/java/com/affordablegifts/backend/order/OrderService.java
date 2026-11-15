@@ -1,6 +1,7 @@
 package com.affordablegifts.backend.order;
 
 import com.affordablegifts.backend.catalog.packaging.Packaging;
+import com.affordablegifts.backend.catalog.packaging.PackagingKind;
 import com.affordablegifts.backend.catalog.packaging.PackagingRepository;
 import com.affordablegifts.backend.catalog.product.PackPrice;
 import com.affordablegifts.backend.catalog.product.Product;
@@ -57,9 +58,20 @@ public class OrderService {
         }
 
         Packaging packaging = packagingRepository.findById(request.packagingId())
-                .filter(Packaging::isActive)
+                .filter(p -> p.isActive() && p.getKind() != PackagingKind.COVER)
                 .orElseThrow(() -> new NotFoundException(
                         "Packaging '" + request.packagingId() + "' is not available"));
+        Packaging cover = findCover(packaging, request.coverId());
+        // One box or jar set: a jar set also pays for its jars (per jar) and its cover.
+        BigDecimal setPackagingPrice = cover == null
+                ? packaging.getPrice()
+                : packaging.getPrice().multiply(BigDecimal.valueOf(packaging.getSlotCount()))
+                        .add(cover.getPrice());
+        String packagingName = cover == null
+                ? packaging.getName() : packaging.getName() + " + " + cover.getName();
+        if (packagingName.length() > 120) { // the order column holds 120 characters
+            packagingName = packagingName.substring(0, 120);
+        }
 
         if (request.productIds().size() != packaging.getSlotCount()) {
             throw new IllegalArgumentException("%s needs exactly %d products, one per slot"
@@ -79,7 +91,7 @@ public class OrderService {
                             .formatted(minimum.toPlainString(), productsSubtotal.toPlainString()));
         }
 
-        BigDecimal packagingTotal = packaging.getPrice().multiply(BigDecimal.valueOf(quantity));
+        BigDecimal packagingTotal = setPackagingPrice.multiply(BigDecimal.valueOf(quantity));
         BigDecimal deliveryCharge = delivery.quote(request.address().pincode()).charge();
         BigDecimal total = productsSubtotal.add(packagingTotal).add(deliveryCharge);
         int totalWeight = packaging.getSlotCount() * packaging.getSlotCapacity() * quantity;
@@ -89,8 +101,8 @@ public class OrderService {
                 "AG-" + orders.nextOrderNumber(),
                 request.requestId(),
                 packaging.getId(),
-                packaging.getName(),
-                new Pricing(packaging.getPrice(), quantity, productsSubtotal, packagingTotal,
+                packagingName,
+                new Pricing(setPackagingPrice, quantity, productsSubtotal, packagingTotal,
                         deliveryCharge, total, totalWeight),
                 request.customer().name().trim(),
                 request.customer().phone(),
@@ -124,6 +136,28 @@ public class OrderService {
             items.add(new OrderItem(slot, product.getId(), product.getName(), pack.getWeight(), pack.getPrice()));
         }
         return items;
+    }
+
+    /**
+     * Glass jars need a cover that fits them (same layout); boxes take none. Throws when the
+     * choice is missing, inactive, not a cover, or the wrong size.
+     */
+    private Packaging findCover(Packaging packaging, String coverId) {
+        if (packaging.getKind() != PackagingKind.JAR) {
+            if (coverId != null && !coverId.isBlank()) {
+                throw new IllegalArgumentException(packaging.getName() + " does not take a cover");
+            }
+            return null;
+        }
+        if (coverId == null || coverId.isBlank()) {
+            throw new IllegalArgumentException("Choose a glass jar cover for " + packaging.getName());
+        }
+        return packagingRepository.findById(coverId)
+                .filter(c -> c.isActive() && c.getKind() == PackagingKind.COVER)
+                .filter(c -> c.getSlotCount() == packaging.getSlotCount()
+                        && c.getSlotCapacity() == packaging.getSlotCapacity())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "That cover does not fit " + packaging.getName()));
     }
 
     private static String blankToNull(String value) {

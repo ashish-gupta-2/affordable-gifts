@@ -19,6 +19,7 @@ public final class PackagingDtos {
     public record PackagingResponse(String id, String name, PackagingKind kind, String description,
                                     BigDecimal price, int slotCount, int slotCapacity,
                                     String imageUrl) {
+        /** {@code price} is per box, per jar, or per cover, depending on {@code kind}. */
         static PackagingResponse from(Packaging p) {
             return new PackagingResponse(p.getId(), p.getName(), p.getKind(), p.getDescription(),
                     p.getPrice(), p.getSlotCount(), p.getSlotCapacity(), p.getImageUrl());

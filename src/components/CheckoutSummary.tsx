@@ -11,6 +11,7 @@ interface Props {
 export default function CheckoutSummary({ builder, deliveryCharge }: Props) {
   const {
     selectedPackaging,
+    selectedCover,
     packagingQuantity,
     slots,
     packagingPrice,
@@ -31,6 +32,7 @@ export default function CheckoutSummary({ builder, deliveryCharge }: Props) {
 
       <p className="font-semibold">
         {packagingQuantity} × {selectedPackaging.name}
+        {selectedCover && ` + ${selectedCover.name}`}
       </p>
       <p className="mb-3 text-sm text-gray-500">
         Each {isJar ? "jar set" : "box"} contains:

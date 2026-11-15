@@ -14,6 +14,8 @@ export type Slot = SlotFill | null;
 export function useGiftBuilder(minOrderValue: number) {
   const [selectedPackaging, setSelectedPackaging] =
     useState<Packaging | null>(null);
+  // Glass jars also need an outer cover; boxes do not.
+  const [selectedCover, setSelectedCover] = useState<Packaging | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
   // `slots` describes ONE box / jar set. Every copy is identical, so the
   // quantity simply multiplies the set (price, weight, packaging).
@@ -25,6 +27,14 @@ export function useGiftBuilder(minOrderValue: number) {
       selectedPackaging?.slotCapacity === packaging.slotCapacity;
 
     setSelectedPackaging(packaging);
+    // A cover only fits the jar layout it was made for.
+    setSelectedCover((cover) =>
+      packaging.kind === "jar" &&
+      cover?.slotCount === packaging.slotCount &&
+      cover.slotCapacity === packaging.slotCapacity
+        ? cover
+        : null
+    );
     setSlots((current) =>
       Array.from(
         { length: packaging.slotCount },
@@ -32,6 +42,8 @@ export function useGiftBuilder(minOrderValue: number) {
       )
     );
   };
+
+  const selectCover = (cover: Packaging) => setSelectedCover(cover);
 
   const increasePackaging = () => {
     if (!selectedPackaging) return;
@@ -91,12 +103,23 @@ export function useGiftBuilder(minOrderValue: number) {
 
   const emptySlotCount = slots.filter((slot) => slot === null).length;
 
-  const packagingPrice = (selectedPackaging?.price ?? 0) * packagingQuantity;
+  const needsCover = selectedPackaging?.kind === "jar";
+
+  /** One box, or one jar set: the jars plus the chosen cover. */
+  const setPackagingPrice = !selectedPackaging
+    ? 0
+    : needsCover
+      ? selectedPackaging.price * selectedPackaging.slotCount +
+        (selectedCover?.price ?? 0)
+      : selectedPackaging.price;
+
+  const packagingPrice = setPackagingPrice * packagingQuantity;
 
   const totalPrice = productTotal + packagingPrice;
 
   const reset = () => {
     setSelectedPackaging(null);
+    setSelectedCover(null);
     setSlots([]);
     setPackagingQuantity(1);
   };
@@ -104,11 +127,18 @@ export function useGiftBuilder(minOrderValue: number) {
   const remainingAmount = Math.max(0, minOrderValue - productTotal);
 
   const canCheckout =
-    selectedPackaging !== null && emptySlotCount === 0 && remainingAmount === 0;
+    selectedPackaging !== null &&
+    (!needsCover || selectedCover !== null) &&
+    emptySlotCount === 0 &&
+    remainingAmount === 0;
 
   return {
     selectedPackaging,
     selectPackaging,
+    selectedCover,
+    selectCover,
+    needsCover,
+    setPackagingPrice,
     packagingQuantity,
     increasePackaging,
     decreasePackaging,
