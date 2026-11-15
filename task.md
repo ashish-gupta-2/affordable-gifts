@@ -18,7 +18,7 @@ Move an item from **Pending** to **Done** (`[ ]` → `[x]`) when it is finished 
 
 ### Frontend – checkout
 - [x] Build → Checkout → Confirmation flow (`App.tsx`)
-- [x] Checkout form: name, mobile, email (optional), address, PIN code, instructions
+- [x] Checkout form: name, mobile, email, address, PIN code (all required, marked with a red *), delivery instructions (optional)
 - [x] Live delivery quote by PIN code (local ₹50 / India-wide ₹110)
 - [x] Order summary with products, packaging, delivery and total
 - [x] Form and box kept when going "Back to edit your box"
@@ -44,7 +44,17 @@ Move an item from **Pending** to **Done** (`[ ]` → `[x]`) when it is finished 
 - [x] `POST /api/orders`: server-side pricing, price snapshot, never trusts browser prices
 - [x] Idempotent checkout via `requestId` (retry returns the same order)
 - [x] Order numbers (`AG-1001`…), items stored per slot
-- [x] Tests: 34 passing (catalogue, orders, admin console)
+- [x] Order confirmation email via Gmail SMTP (sent after commit, never breaks an order; see `EMAIL.md`)
+- [x] Tests: 49 passing (catalogue, orders, admin console, email, security)
+- [x] Lombok annotation processor declared in `pom.xml` (needed on JDK 23+; a clean build had been failing)
+
+### Security (see `SECURITY.md`)
+- [x] Security headers, `no-store` on admin/order responses, no server banner
+- [x] Error responses reveal no path, timestamp, stack trace or exception
+- [x] `requestId` must be a UUID (stops replay / reading someone else's order)
+- [x] Admin brute-force lockout, per-IP order cap, 20 KB body limit
+- [x] Production refuses to start with an admin key under 24 characters
+- [x] Frontend: production CSP, no source maps, no secrets in the bundle
 
 ### Database and docs
 - [x] Local Postgres databases `affordable_gifts` (dev) and `affordable_gifts_test`
@@ -53,6 +63,13 @@ Move an item from **Pending** to **Done** (`[ ]` → `[x]`) when it is finished 
 - [x] `DB.md`: quick start, connecting, tables, Flyway, reset steps
 
 ## item-pending
+
+### Security follow-ups
+- [ ] Revoke the exposed Gmail App Password and create a new one
+- [ ] Real admin accounts with login, roles and an audit log (replace the shared key)
+- [ ] CAPTCHA on checkout
+- [ ] HTTPS, reverse proxy forwarded-header setup, WAF / CDN (see production checklist)
+- [ ] Dependency vulnerability scans (`npm audit`, OWASP dependency-check)
 
 ### Next up – Admin console follow-ups
 - [ ] Real admin accounts/roles (the console still uses the shared `X-Admin-Key`)
@@ -72,7 +89,8 @@ an account, and test API keys.
 
 ### Storefront features
 - [ ] Greeting card: choose design, personal message, preview, store with order
-- [ ] Order notifications (email / SMS / WhatsApp)
+- [ ] Set up Gmail App Password in `backend/.env.local` and send a real test email (see `EMAIL.md`)
+- [ ] More notifications: status-change emails, email to the shop owner, SMS / WhatsApp
 - [ ] Order tracking page for customers
 - [ ] "Suggest a bigger box" nudge
 - [ ] Mixed orders (several different boxes/jar sets in one cart)

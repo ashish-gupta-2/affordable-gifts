@@ -68,7 +68,7 @@ class AdminConsoleApiTest {
                  "customer":{"name":"Asha Rao","phone":"9876543210","email":"asha@example.com"},
                  "address":{"house":"12","street":"MG Road","area":"Indiranagar","city":"Bengaluru",
                             "state":"Karnataka","pincode":"560001","instructions":"Ring twice"}}"""
-                .formatted(requestId)));
+                .formatted(java.util.UUID.nameUUIDFromBytes(requestId.getBytes()))));
     }
 
     // ----------------------------------------------------------------- auth

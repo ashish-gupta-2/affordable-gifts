@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Local secrets (DB password, admin key, Gmail App Password) ###
+.env
+.env.*
+!.env.example
