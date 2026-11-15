@@ -1,4 +1,5 @@
 import type { Packaging } from "../types";
+import CatalogImage from "./CatalogImage";
 
 interface Props {
   packagingOptions: Packaging[];
@@ -55,6 +56,15 @@ export default function PackagingSelector({
                           : "border-gray-200"
                       }`}
                     >
+                      {packaging.imageUrl && (
+                        <div className="mb-3 h-32 overflow-hidden rounded-xl bg-gray-100">
+                          <CatalogImage
+                            imageUrl={packaging.imageUrl}
+                            alt={packaging.name}
+                            className="h-full w-full"
+                          />
+                        </div>
+                      )}
                       <div className="flex items-center justify-between">
                         <span className="font-semibold text-gray-900">
                           {packaging.name}

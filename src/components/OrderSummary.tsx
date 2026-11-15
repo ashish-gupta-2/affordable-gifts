@@ -1,3 +1,4 @@
+import ProductThumb from "./ProductThumb";
 import type { Packaging } from "../types";
 import type { Slot } from "../hooks/useGiftBuilder";
 
@@ -75,7 +76,7 @@ export default function OrderSummary({
                 <div className="mt-1 flex items-center justify-between gap-3">
                   <div>
                     <p className="font-semibold">
-                      {slot.product.emoji} {slot.product.name}
+                      <ProductThumb product={slot.product} /> {slot.product.name}
                     </p>
                     <p className="text-sm text-gray-500">
                       {slot.weight}g

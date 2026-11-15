@@ -1,6 +1,8 @@
 import { useCallback, useState, type FormEvent } from "react";
 import { formatRupees } from "../lib/format";
+import CatalogImage from "../components/CatalogImage";
 import type { AdminApi } from "./api";
+import ImageField from "./ImageField";
 import type { AdminProduct } from "./types";
 import { inputClass, primaryButton, secondaryButton } from "./ui";
 import { useResource } from "./useResource";
@@ -10,6 +12,7 @@ interface FormState {
   name: string;
   category: AdminProduct["category"];
   emoji: string;
+  imageUrl: string | null;
   displayOrder: string;
   active: boolean;
   price100: string;
@@ -21,6 +24,7 @@ const blankForm: FormState = {
   name: "",
   category: "Dry Fruits",
   emoji: "",
+  imageUrl: null,
   displayOrder: "0",
   active: true,
   price100: "",
@@ -35,6 +39,7 @@ function toForm(product: AdminProduct): FormState {
     name: product.name,
     category: product.category,
     emoji: product.emoji,
+    imageUrl: product.imageUrl,
     displayOrder: String(product.displayOrder),
     active: product.active,
     price100: price(100),
@@ -79,6 +84,7 @@ function ProductForm({
       name: form.name,
       category: form.category,
       emoji: form.emoji,
+      imageUrl: form.imageUrl,
       displayOrder: Number(form.displayOrder) || 0,
       packs,
     };
@@ -117,9 +123,10 @@ function ProductForm({
           <input required maxLength={120} className={inputClass} value={form.name} onChange={(e) => set("name", e.target.value)} />
         </label>
         <label className="block">
-          <span className="mb-1 block text-sm font-medium">Emoji</span>
-          <input required maxLength={16} className={inputClass} value={form.emoji} onChange={(e) => set("emoji", e.target.value)} />
+          <span className="mb-1 block text-sm font-medium">Emoji (used when there is no photo)</span>
+          <input maxLength={16} className={inputClass} value={form.emoji} onChange={(e) => set("emoji", e.target.value)} />
         </label>
+        <ImageField api={api} value={form.imageUrl} onChange={(url) => set("imageUrl", url)} />
         <label className="block">
           <span className="mb-1 block text-sm font-medium">Category</span>
           <select className={inputClass} value={form.category} onChange={(e) => set("category", e.target.value as FormState["category"])}>
@@ -177,6 +184,7 @@ export default function ProductsPanel({ api }: { api: AdminApi }) {
           name: product.name,
           category: product.category,
           emoji: product.emoji,
+          imageUrl: product.imageUrl,
           displayOrder: product.displayOrder,
           packs: product.packs,
           active: true,
@@ -232,8 +240,15 @@ export default function ProductsPanel({ api }: { api: AdminApi }) {
               {data.map((product) => (
                 <tr key={product.id} className={`border-b border-gray-100 ${product.active ? "" : "text-gray-400"}`}>
                   <td className="px-4 py-3 font-medium">
-                    {product.emoji} {product.name}
-                    <div className="text-xs text-gray-400">{product.id}</div>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-gray-100 text-2xl">
+                        <CatalogImage imageUrl={product.imageUrl} emoji={product.emoji} alt="" className="h-full w-full !text-2xl" />
+                      </div>
+                      <div>
+                        {product.name}
+                        <div className="text-xs text-gray-400">{product.id}</div>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-4 py-3">{product.category}</td>
                   <td className="px-4 py-3">

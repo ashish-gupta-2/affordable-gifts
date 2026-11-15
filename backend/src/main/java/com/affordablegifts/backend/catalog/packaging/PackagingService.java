@@ -38,7 +38,7 @@ public class PackagingService {
         }
         validateJarCover(r.kind(), r.slotCount(), r.slotCapacity());
         Packaging packaging = new Packaging(r.id(), r.name(), r.kind(), r.description(),
-                r.price(), r.slotCount(), r.slotCapacity(), orZero(r.displayOrder()));
+                r.price(), r.slotCount(), r.slotCapacity(), r.imageUrl(), orZero(r.displayOrder()));
         return AdminPackagingResponse.from(repository.save(packaging));
     }
 
@@ -47,7 +47,7 @@ public class PackagingService {
         Packaging packaging = find(id);
         validateJarCover(r.kind(), r.slotCount(), r.slotCapacity());
         packaging.update(r.name(), r.kind(), r.description(), r.price(),
-                r.slotCount(), r.slotCapacity(), orZero(r.displayOrder()), r.active());
+                r.slotCount(), r.slotCapacity(), r.imageUrl(), orZero(r.displayOrder()), r.active());
         return AdminPackagingResponse.from(packaging);
     }
 

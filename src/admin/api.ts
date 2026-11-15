@@ -8,6 +8,8 @@ export class UnauthorizedError extends Error {
 export interface AdminApi {
   get: <T>(path: string) => Promise<T>;
   send: <T>(method: "POST" | "PUT" | "PATCH" | "DELETE", path: string, body?: unknown) => Promise<T>;
+  /** Uploads a photo and returns its URL. */
+  uploadImage: (file: File) => Promise<string>;
 }
 
 async function readError(response: Response): Promise<string> {
@@ -48,9 +50,24 @@ export function createAdminApi(
     return response.json() as Promise<T>;
   }
 
+  async function uploadImage(file: File): Promise<string> {
+    const response = await fetch("/api/admin/images", {
+      method: "POST",
+      headers: { "X-Admin-Key": key, "Content-Type": "application/octet-stream" },
+      body: file,
+    });
+    if (response.status === 401) {
+      onUnauthorized();
+      throw new UnauthorizedError();
+    }
+    if (!response.ok) throw new Error(await readError(response));
+    return ((await response.json()) as { url: string }).url;
+  }
+
   return {
     get: (path) => request("GET", path),
     send: (method, path, body) => request(method, path, body),
+    uploadImage,
   };
 }
 

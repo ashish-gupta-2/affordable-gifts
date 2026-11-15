@@ -1,5 +1,6 @@
 package com.affordablegifts.backend.catalog.product;
 
+import com.affordablegifts.backend.image.ImageService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -19,19 +20,19 @@ public final class ProductDtos {
 
     /** Shape consumed by the storefront (matches the frontend `Product` type). */
     public record ProductResponse(String id, String name, ProductCategory category,
-                                  String emoji, List<PackResponse> packs) {
+                                  String emoji, String imageUrl, List<PackResponse> packs) {
         static ProductResponse from(Product product) {
             return new ProductResponse(product.getId(), product.getName(), product.getCategory(),
-                    product.getEmoji(), packsOf(product));
+                    product.getEmoji(), product.getImageUrl(), packsOf(product));
         }
     }
 
     public record AdminProductResponse(String id, String name, ProductCategory category,
-                                       String emoji, boolean active, int displayOrder,
+                                       String emoji, String imageUrl, boolean active, int displayOrder,
                                        List<PackResponse> packs) {
         static AdminProductResponse from(Product product) {
             return new AdminProductResponse(product.getId(), product.getName(), product.getCategory(),
-                    product.getEmoji(), product.isActive(), product.getDisplayOrder(), packsOf(product));
+                    product.getEmoji(), product.getImageUrl(), product.isActive(), product.getDisplayOrder(), packsOf(product));
         }
     }
 
@@ -49,7 +50,8 @@ public final class ProductDtos {
             @Size(max = 64) String id,
             @NotBlank @Size(max = 120) String name,
             @NotNull ProductCategory category,
-            @NotBlank @Size(max = 16) String emoji,
+            @Size(max = 16) String emoji,
+            @Pattern(regexp = ImageService.URL_REGEX, message = "must be an uploaded image") String imageUrl,
             Integer displayOrder,
             @NotEmpty List<@Valid PackRequest> packs) {
     }
@@ -57,7 +59,8 @@ public final class ProductDtos {
     public record UpdateProductRequest(
             @NotBlank @Size(max = 120) String name,
             @NotNull ProductCategory category,
-            @NotBlank @Size(max = 16) String emoji,
+            @Size(max = 16) String emoji,
+            @Pattern(regexp = ImageService.URL_REGEX, message = "must be an uploaded image") String imageUrl,
             Integer displayOrder,
             @NotNull Boolean active,
             @NotEmpty List<@Valid PackRequest> packs) {

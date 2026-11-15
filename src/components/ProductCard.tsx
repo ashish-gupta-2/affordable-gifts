@@ -1,4 +1,5 @@
 import type { Product } from "../types";
+import CatalogImage from "./CatalogImage";
 
 interface Props {
   product: Product;
@@ -21,10 +22,13 @@ export default function ProductCard({
 
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-      <div className="flex h-40 items-center justify-center bg-gradient-to-br from-yellow-50 to-orange-100">
-        <span className="text-5xl">
-            {product.emoji}
-        </span>
+      <div className="h-40 bg-gradient-to-br from-yellow-50 to-orange-100">
+        <CatalogImage
+          imageUrl={product.imageUrl}
+          emoji={product.emoji}
+          alt={product.name}
+          className="h-full w-full"
+        />
       </div>
 
       <div className="p-5">

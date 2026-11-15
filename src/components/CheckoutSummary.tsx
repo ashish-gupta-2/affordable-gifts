@@ -1,3 +1,4 @@
+import ProductThumb from "./ProductThumb";
 import { formatRupees } from "../lib/format";
 import type { GiftBuilder } from "../hooks/useGiftBuilder";
 
@@ -40,7 +41,7 @@ export default function CheckoutSummary({ builder, deliveryCharge }: Props) {
           slot ? (
             <li key={index} className="flex justify-between">
               <span>
-                {slot.product.emoji} {slot.product.name} · {slot.weight}g
+                <ProductThumb product={slot.product} /> {slot.product.name} · {slot.weight}g
               </span>
               <span>{formatRupees(slot.price)}</span>
             </li>

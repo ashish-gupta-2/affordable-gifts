@@ -28,6 +28,9 @@ public class Product {
     @Column(nullable = false)
     private String emoji;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(nullable = false)
     private boolean active = true;
 
@@ -48,20 +51,22 @@ public class Product {
     }
 
     public Product(String id, String name, ProductCategory category, String emoji,
-                   int displayOrder, List<PackPrice> packs) {
+                   String imageUrl, int displayOrder, List<PackPrice> packs) {
         this.id = id;
         this.name = name;
         this.category = category.label();
         this.emoji = emoji;
+        this.imageUrl = imageUrl;
         this.displayOrder = displayOrder;
         this.packs = new ArrayList<>(packs);
     }
 
-    public void update(String name, ProductCategory category, String emoji,
+    public void update(String name, ProductCategory category, String emoji, String imageUrl,
                        int displayOrder, boolean active, List<PackPrice> packs) {
         this.name = name;
         this.category = category.label();
         this.emoji = emoji;
+        this.imageUrl = imageUrl;
         this.displayOrder = displayOrder;
         this.active = active;
         this.packs.clear();
@@ -78,6 +83,7 @@ public class Product {
     public String getName() { return name; }
     public ProductCategory getCategory() { return ProductCategory.fromLabel(category); }
     public String getEmoji() { return emoji; }
+    public String getImageUrl() { return imageUrl; }
     public boolean isActive() { return active; }
     public int getDisplayOrder() { return displayOrder; }
     public List<PackPrice> getPacks() { return packs; }

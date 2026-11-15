@@ -18,7 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *   <li>placing orders is capped (each order can send an email, so this also stops
  *       the shop being used to spam someone's inbox);</li>
  *   <li>too many wrong admin keys locks admin calls out for a while (brute force);</li>
- *   <li>request bodies over 20 KB are refused.</li>
+ *   <li>request bodies over 20 KB are refused (1.1 MB for admin photo uploads).</li>
  * </ul>
  * Counters live in memory, so they reset on restart and are per instance. Behind a
  * reverse proxy the client IP is the proxy's unless forwarded headers are configured
@@ -29,6 +29,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class RequestLimitFilter extends OncePerRequestFilter {
 
     private static final long MAX_BODY_BYTES = 20_000;
+    /** Photo uploads (admin only) get more room; the image service enforces its own limit. */
+    private static final long MAX_UPLOAD_BYTES = 1_100_000;
 
     private final SlidingWindowLimiter orders;
     private final SlidingWindowLimiter adminFailures;
@@ -47,7 +49,8 @@ public class RequestLimitFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        if (request.getContentLengthLong() > MAX_BODY_BYTES) {
+        boolean upload = "POST".equals(method) && path.equals("/api/admin/images");
+        if (request.getContentLengthLong() > (upload ? MAX_UPLOAD_BYTES : MAX_BODY_BYTES)) {
             reject(response, 413, "Request too large");
             return;
         }
