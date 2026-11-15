@@ -36,7 +36,7 @@ What each step does:
 |---|---|
 | `set -a; . ./.env.local; set +a` | Exports `DB_USERNAME`, `DB_PASSWORD` and `ADMIN_API_KEY` into the current shell. They last only for that terminal window, so repeat this in each new one. |
 | `./mvnw spring-boot:run` | Starts the backend on port 8080. Flyway applies any new migrations on startup. |
-| `./mvnw test` | Runs the 34 backend tests against `affordable_gifts_test`. |
+| `./mvnw test` | Runs the 38 backend tests against `affordable_gifts_test`. |
 | `PGPASSWORD=$DB_PASSWORD psql ...` | Opens a `psql` prompt on the dev database. Type `\dt` to list the tables and `\q` to quit. |
 
 If `psql` or the backend says "no password was provided" or "password authentication

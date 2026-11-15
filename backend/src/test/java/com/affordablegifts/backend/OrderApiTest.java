@@ -59,10 +59,10 @@ class OrderApiTest {
                                 String productIdsJson, String pincode) {
         return """
                 {"requestId":"%s","packagingId":"%s","quantity":%d,"productIds":%s,
-                 "customer":{"name":"Asha Rao","phone":"9876543210","email":""},
+                 "customer":{"name":"Asha Rao","phone":"9876543210","email":"asha@example.com"},
                  "address":{"house":"12","street":"MG Road","area":"Indiranagar","city":"Bengaluru",
                             "state":"Karnataka","pincode":"%s","instructions":""}}"""
-                .formatted(requestId, packagingId, quantity, productIdsJson, pincode);
+                .formatted(java.util.UUID.nameUUIDFromBytes(requestId.getBytes()), packagingId, quantity, productIdsJson, pincode);
     }
 
     private org.springframework.test.web.servlet.ResultActions place(String body) throws Exception {
@@ -181,7 +181,8 @@ class OrderApiTest {
     void validatesCustomerAndAddress() throws Exception {
         String base = order("r13", "box-2", 1, "[\"almonds\",\"cashews\"]", "560001");
         place(base.replace("9876543210", "12345")).andExpect(status().isBadRequest());
-        place(base.replace("\"email\":\"\"", "\"email\":\"not-an-email\"")).andExpect(status().isBadRequest());
+        place(base.replace("asha@example.com", "not-an-email")).andExpect(status().isBadRequest());
+        place(base.replace("asha@example.com", "")).andExpect(status().isBadRequest());
         place(base.replace("560001", "56001")).andExpect(status().isBadRequest());
         place(base.replace("\"quantity\":1", "\"quantity\":0")).andExpect(status().isBadRequest());
         place(base.replace("\"quantity\":1", "\"quantity\":-3")).andExpect(status().isBadRequest());

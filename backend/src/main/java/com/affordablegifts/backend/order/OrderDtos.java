@@ -22,7 +22,7 @@ public final class OrderDtos {
             @NotBlank @Size(max = 120) String name,
             @NotBlank @Pattern(regexp = "[6-9][0-9]{9}", message = "must be a 10-digit Indian mobile number")
             String phone,
-            @Email @Size(max = 160) String email) {
+            @NotBlank @Email @Size(max = 160) String email) {
     }
 
     public record AddressRequest(
@@ -40,7 +40,10 @@ public final class OrderDtos {
      * price up itself. {@code productIds} lists one product per slot, in slot order.
      */
     public record PlaceOrderRequest(
-            @NotBlank @Size(max = 64) String requestId,
+            @NotBlank
+            @Pattern(regexp = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
+                    message = "must be a UUID")
+            String requestId,
             @NotBlank String packagingId,
             @NotNull @Min(1) @Max(50) Integer quantity,
             @NotEmpty @Size(max = 20) List<@NotBlank String> productIds,

@@ -11,6 +11,7 @@ import com.affordablegifts.backend.order.CustomerOrder.Pricing;
 import com.affordablegifts.backend.order.OrderDtos.AddressRequest;
 import com.affordablegifts.backend.order.OrderDtos.OrderResponse;
 import com.affordablegifts.backend.order.OrderDtos.PlaceOrderRequest;
+import org.springframework.context.ApplicationEventPublisher;
 import com.affordablegifts.backend.settings.StoreSettingsService;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -30,15 +31,17 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final DeliveryService delivery;
     private final StoreSettingsService settings;
+    private final ApplicationEventPublisher events;
 
     public OrderService(OrderRepository orders, PackagingRepository packagingRepository,
                         ProductRepository productRepository, DeliveryService delivery,
-                        StoreSettingsService settings) {
+                        StoreSettingsService settings, ApplicationEventPublisher events) {
         this.orders = orders;
         this.packagingRepository = packagingRepository;
         this.productRepository = productRepository;
         this.delivery = delivery;
         this.settings = settings;
+        this.events = events;
     }
 
     /** Result of placing an order; {@code created} is false when a retry hit an existing order. */
@@ -96,7 +99,10 @@ public class OrderService {
                         a.city().trim(), a.state().trim(), a.pincode(), blankToNull(a.instructions())),
                 items);
 
-        return new PlacedOrder(OrderResponse.from(orders.save(order)), true);
+        OrderResponse response = OrderResponse.from(orders.save(order));
+        // Delivered to listeners only after this transaction commits.
+        events.publishEvent(new OrderPlacedEvent(response, order.getCustomerEmail()));
+        return new PlacedOrder(response, true);
     }
 
     private List<OrderItem> buildItems(List<String> productIds, int slotCapacity) {

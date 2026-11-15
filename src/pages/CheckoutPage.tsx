@@ -16,6 +16,16 @@ interface Props {
 const inputClass =
   "w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-600 focus:outline-none focus:ring-1 focus:ring-green-600";
 
+/** Red asterisk marking a mandatory field. */
+function Required() {
+  return (
+    <span className="text-red-600" aria-hidden="true">
+      {" "}
+      *
+    </span>
+  );
+}
+
 export default function CheckoutPage({
   builder,
   details,
@@ -98,7 +108,10 @@ export default function CheckoutPage({
           <h2 className="mb-4 text-xl font-bold">Contact details</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="block md:col-span-2">
-              <span className="mb-1 block text-sm font-medium">Full name</span>
+              <span className="mb-1 block text-sm font-medium">
+                Full name
+                <Required />
+              </span>
               <input
                 required
                 maxLength={120}
@@ -111,6 +124,7 @@ export default function CheckoutPage({
             <label className="block">
               <span className="mb-1 block text-sm font-medium">
                 Mobile number
+                <Required />
               </span>
               <input
                 required
@@ -127,9 +141,11 @@ export default function CheckoutPage({
             </label>
             <label className="block">
               <span className="mb-1 block text-sm font-medium">
-                Email (optional)
+                Email
+                <Required />
               </span>
               <input
+                required
                 type="email"
                 maxLength={160}
                 autoComplete="email"
@@ -147,6 +163,7 @@ export default function CheckoutPage({
             <label className="block">
               <span className="mb-1 block text-sm font-medium">
                 House / apartment no.
+                <Required />
               </span>
               <input
                 required
@@ -157,7 +174,10 @@ export default function CheckoutPage({
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-sm font-medium">Street</span>
+              <span className="mb-1 block text-sm font-medium">
+                Street
+                <Required />
+              </span>
               <input
                 required
                 maxLength={160}
@@ -169,6 +189,7 @@ export default function CheckoutPage({
             <label className="block">
               <span className="mb-1 block text-sm font-medium">
                 Area / locality
+                <Required />
               </span>
               <input
                 required
@@ -179,7 +200,10 @@ export default function CheckoutPage({
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-sm font-medium">PIN code</span>
+              <span className="mb-1 block text-sm font-medium">
+                PIN code
+                <Required />
+              </span>
               <input
                 required
                 inputMode="numeric"
@@ -205,7 +229,10 @@ export default function CheckoutPage({
               )}
             </label>
             <label className="block">
-              <span className="mb-1 block text-sm font-medium">City</span>
+              <span className="mb-1 block text-sm font-medium">
+                City
+                <Required />
+              </span>
               <input
                 required
                 maxLength={80}
@@ -215,7 +242,10 @@ export default function CheckoutPage({
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-sm font-medium">State</span>
+              <span className="mb-1 block text-sm font-medium">
+                State
+                <Required />
+              </span>
               <input
                 required
                 maxLength={80}
