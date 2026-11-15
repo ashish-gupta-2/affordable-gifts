@@ -1,6 +1,8 @@
 import { useCallback, useState, type FormEvent } from "react";
 import { formatRupees } from "../lib/format";
+import CatalogImage from "../components/CatalogImage";
 import type { AdminApi } from "./api";
+import ImageField from "./ImageField";
 import type { AdminPackaging } from "./types";
 import { inputClass, primaryButton, secondaryButton } from "./ui";
 import { useResource } from "./useResource";
@@ -13,6 +15,7 @@ interface FormState {
   price: string;
   slotCount: string;
   slotCapacity: string;
+  imageUrl: string | null;
   displayOrder: string;
   active: boolean;
 }
@@ -25,6 +28,7 @@ const blankForm: FormState = {
   price: "",
   slotCount: "2",
   slotCapacity: "100",
+  imageUrl: null,
   displayOrder: "0",
   active: true,
 };
@@ -38,6 +42,7 @@ function toForm(p: AdminPackaging): FormState {
     price: String(p.price),
     slotCount: String(p.slotCount),
     slotCapacity: String(p.slotCapacity),
+    imageUrl: p.imageUrl,
     displayOrder: String(p.displayOrder),
     active: p.active,
   };
@@ -70,6 +75,7 @@ function PackagingForm({
       price: Number(form.price),
       slotCount: Number(form.slotCount),
       slotCapacity: Number(form.slotCapacity),
+      imageUrl: form.imageUrl,
       displayOrder: Number(form.displayOrder) || 0,
     };
     try {
@@ -129,6 +135,7 @@ function PackagingForm({
           <span className="mb-1 block text-sm font-medium">Grams per slot</span>
           <input required type="number" min="1" className={inputClass} value={form.slotCapacity} onChange={(e) => set("slotCapacity", e.target.value)} />
         </label>
+        <ImageField api={api} value={form.imageUrl} onChange={(url) => set("imageUrl", url)} />
         <label className="block">
           <span className="mb-1 block text-sm font-medium">Display order</span>
           <input type="number" className={inputClass} value={form.displayOrder} onChange={(e) => set("displayOrder", e.target.value)} />
@@ -175,6 +182,7 @@ export default function PackagingPanel({ api }: { api: AdminApi }) {
           price: item.price,
           slotCount: item.slotCount,
           slotCapacity: item.slotCapacity,
+          imageUrl: item.imageUrl,
           displayOrder: item.displayOrder,
           active: true,
         });
@@ -230,8 +238,15 @@ export default function PackagingPanel({ api }: { api: AdminApi }) {
               {data.map((item) => (
                 <tr key={item.id} className={`border-b border-gray-100 ${item.active ? "" : "text-gray-400"}`}>
                   <td className="px-4 py-3 font-medium">
-                    {item.name}
-                    <div className="text-xs text-gray-400">{item.id}</div>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                        {item.imageUrl && <CatalogImage imageUrl={item.imageUrl} alt="" className="h-full w-full" />}
+                      </div>
+                      <div>
+                        {item.name}
+                        <div className="text-xs text-gray-400">{item.id}</div>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-4 py-3">{item.kind === "box" ? "Gift box" : "Glass jars"}</td>
                   <td className="px-4 py-3">

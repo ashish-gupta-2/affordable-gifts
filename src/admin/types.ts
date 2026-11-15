@@ -65,6 +65,7 @@ export interface AdminProduct {
   name: string;
   category: "Dry Fruits" | "Snacks";
   emoji: string;
+  imageUrl: string | null;
   active: boolean;
   displayOrder: number;
   packs: { weight: number; price: number }[];
@@ -78,6 +79,7 @@ export interface AdminPackaging {
   price: number;
   slotCount: number;
   slotCapacity: number;
+  imageUrl: string | null;
   active: boolean;
   displayOrder: number;
 }

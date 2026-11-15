@@ -40,14 +40,15 @@ public class ProductService {
             throw new ConflictException("Product '" + request.id() + "' already exists");
         }
         Product product = new Product(request.id(), request.name(), request.category(),
-                request.emoji(), orZero(request.displayOrder()), toPacks(request.packs()));
+                emojiOf(request.emoji()), request.imageUrl(), orZero(request.displayOrder()),
+                toPacks(request.packs()));
         return AdminProductResponse.from(repository.save(product));
     }
 
     @Transactional
     public AdminProductResponse update(String id, UpdateProductRequest request) {
         Product product = find(id);
-        product.update(request.name(), request.category(), request.emoji(),
+        product.update(request.name(), request.category(), emojiOf(request.emoji()), request.imageUrl(),
                 orZero(request.displayOrder()), request.active(), toPacks(request.packs()));
         return AdminProductResponse.from(product);
     }
@@ -61,6 +62,11 @@ public class ProductService {
     private Product find(String id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product '" + id + "' not found"));
+    }
+
+    /** The emoji is only a fallback for products without a photo, so it may be empty. */
+    private static String emojiOf(String emoji) {
+        return emoji == null ? "" : emoji.trim();
     }
 
     private static int orZero(Integer value) {

@@ -46,8 +46,14 @@ Move an item from **Pending** to **Done** (`[ ]` → `[x]`) when it is finished 
 - [x] Idempotent checkout via `requestId` (retry returns the same order)
 - [x] Order numbers (`AG-1001`…), items stored per slot
 - [x] Order confirmation email via Gmail SMTP (sent after commit, never breaks an order; see `EMAIL.md`)
-- [x] Tests: 50 passing (catalogue, orders, admin console, email, security)
+- [x] Tests: 58 passing (catalogue, orders, admin console, email, security)
 - [x] Lombok annotation processor declared in `pom.xml` (needed on JDK 23+; a clean build had been failing)
+
+### Product and packaging photos (see `IMAGES.md`)
+- [x] Upload a photo for each product, gift box and glass jar set from the admin console
+- [x] Photos stored in Postgres (`images` table) and served at `/api/images/{id}`, cached for a year
+- [x] Only real JPEG / PNG / WebP up to 1 MB (SVG refused); photo URLs limited to our own uploads
+- [x] Storefront cards, packaging cards and cart show the photo; the emoji is now an optional fallback
 
 ### Security (see `SECURITY.md`)
 - [x] Security headers, `no-store` on admin/order responses, no server banner
@@ -64,6 +70,10 @@ Move an item from **Pending** to **Done** (`[ ]` → `[x]`) when it is finished 
 - [x] `DB.md`: quick start, connecting, tables, Flyway, reset steps
 
 ## item-pending
+
+### Photos follow-ups
+- [ ] Move photos to Cloudflare R2 when the catalogue grows (only `ImageService` changes; see `IMAGES.md`)
+- [ ] Delete unused photos left behind when one is replaced
 
 ### Security follow-ups
 - [ ] Revoke the exposed Gmail App Password and create a new one

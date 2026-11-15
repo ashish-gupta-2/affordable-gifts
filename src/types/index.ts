@@ -8,7 +8,10 @@ export interface Product {
   id: string;
   name: string;
   category: "Dry Fruits" | "Snacks";
+  /** Fallback shown when the product has no photo. */
   emoji: string;
+  /** Uploaded photo (/api/images/...); null when none. */
+  imageUrl: string | null;
   packs: PackPrice[];
 }
 
@@ -23,6 +26,8 @@ export interface Packaging {
   slotCount: number;
   /** Grams of a single product each slot holds. */
   slotCapacity: number;
+  /** Uploaded photo (/api/images/...); null when none. */
+  imageUrl: string | null;
 }
 
 export interface GreetingCard {

@@ -1,5 +1,6 @@
 package com.affordablegifts.backend.catalog.packaging;
 
+import com.affordablegifts.backend.image.ImageService;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
@@ -16,19 +17,21 @@ public final class PackagingDtos {
 
     /** Shape consumed by the storefront (matches the frontend `Packaging` type). */
     public record PackagingResponse(String id, String name, PackagingKind kind, String description,
-                                    BigDecimal price, int slotCount, int slotCapacity) {
+                                    BigDecimal price, int slotCount, int slotCapacity,
+                                    String imageUrl) {
         static PackagingResponse from(Packaging p) {
             return new PackagingResponse(p.getId(), p.getName(), p.getKind(), p.getDescription(),
-                    p.getPrice(), p.getSlotCount(), p.getSlotCapacity());
+                    p.getPrice(), p.getSlotCount(), p.getSlotCapacity(), p.getImageUrl());
         }
     }
 
     public record AdminPackagingResponse(String id, String name, PackagingKind kind, String description,
                                          BigDecimal price, int slotCount, int slotCapacity,
-                                         boolean active, int displayOrder) {
+                                         String imageUrl, boolean active, int displayOrder) {
         static AdminPackagingResponse from(Packaging p) {
             return new AdminPackagingResponse(p.getId(), p.getName(), p.getKind(), p.getDescription(),
-                    p.getPrice(), p.getSlotCount(), p.getSlotCapacity(), p.isActive(), p.getDisplayOrder());
+                    p.getPrice(), p.getSlotCount(), p.getSlotCapacity(), p.getImageUrl(), p.isActive(),
+                    p.getDisplayOrder());
         }
     }
 
@@ -42,6 +45,7 @@ public final class PackagingDtos {
             @Digits(integer = 8, fraction = 2, message = "at most 2 decimal places") BigDecimal price,
             @NotNull @Min(value = 1, message = "must be at least 1") Integer slotCount,
             @NotNull @Min(value = 1, message = "must be at least 1 gram") Integer slotCapacity,
+            @Pattern(regexp = ImageService.URL_REGEX, message = "must be an uploaded image") String imageUrl,
             Integer displayOrder) {
     }
 
@@ -53,6 +57,7 @@ public final class PackagingDtos {
             @Digits(integer = 8, fraction = 2, message = "at most 2 decimal places") BigDecimal price,
             @NotNull @Min(value = 1, message = "must be at least 1") Integer slotCount,
             @NotNull @Min(value = 1, message = "must be at least 1 gram") Integer slotCapacity,
+            @Pattern(regexp = ImageService.URL_REGEX, message = "must be an uploaded image") String imageUrl,
             Integer displayOrder,
             @NotNull Boolean active) {
     }

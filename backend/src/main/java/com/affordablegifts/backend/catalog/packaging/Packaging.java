@@ -32,6 +32,9 @@ public class Packaging {
     @Column(name = "slot_capacity", nullable = false)
     private int slotCapacity;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(nullable = false)
     private boolean active = true;
 
@@ -48,7 +51,8 @@ public class Packaging {
     }
 
     public Packaging(String id, String name, PackagingKind kind, String description,
-                     BigDecimal price, int slotCount, int slotCapacity, int displayOrder) {
+                     BigDecimal price, int slotCount, int slotCapacity, String imageUrl,
+                     int displayOrder) {
         this.id = id;
         this.name = name;
         this.kind = kind.wire();
@@ -56,17 +60,20 @@ public class Packaging {
         this.price = price;
         this.slotCount = slotCount;
         this.slotCapacity = slotCapacity;
+        this.imageUrl = imageUrl;
         this.displayOrder = displayOrder;
     }
 
     public void update(String name, PackagingKind kind, String description, BigDecimal price,
-                       int slotCount, int slotCapacity, int displayOrder, boolean active) {
+                       int slotCount, int slotCapacity, String imageUrl, int displayOrder,
+                       boolean active) {
         this.name = name;
         this.kind = kind.wire();
         this.description = description;
         this.price = price;
         this.slotCount = slotCount;
         this.slotCapacity = slotCapacity;
+        this.imageUrl = imageUrl;
         this.displayOrder = displayOrder;
         this.active = active;
         this.updatedAt = Instant.now();
@@ -84,6 +91,7 @@ public class Packaging {
     public BigDecimal getPrice() { return price; }
     public int getSlotCount() { return slotCount; }
     public int getSlotCapacity() { return slotCapacity; }
+    public String getImageUrl() { return imageUrl; }
     public boolean isActive() { return active; }
     public int getDisplayOrder() { return displayOrder; }
 }
