@@ -38,6 +38,7 @@ Move an item from **Pending** to **Done** (`[ ]` → `[x]`) when it is finished 
 ### Backend (`backend/`: Spring Boot 4.1, Java 25, Postgres, Flyway)
 - [x] Project scaffold, schema and dev seed data
 - [x] Public API: `GET /api/products`, `GET /api/packaging`, `GET /api/settings`
+- [x] Health check `GET /api/health` returns `{"status":"UP"}` (for Render's health check path)
 - [x] Admin API (`X-Admin-Key`): create/read/update/soft-delete products and packaging
 - [x] Validation and error mapping (400 / 401 / 404 / 409)
 - [x] `GET /api/delivery-quote?pincode=`
@@ -45,7 +46,7 @@ Move an item from **Pending** to **Done** (`[ ]` → `[x]`) when it is finished 
 - [x] Idempotent checkout via `requestId` (retry returns the same order)
 - [x] Order numbers (`AG-1001`…), items stored per slot
 - [x] Order confirmation email via Gmail SMTP (sent after commit, never breaks an order; see `EMAIL.md`)
-- [x] Tests: 49 passing (catalogue, orders, admin console, email, security)
+- [x] Tests: 50 passing (catalogue, orders, admin console, email, security)
 - [x] Lombok annotation processor declared in `pom.xml` (needed on JDK 23+; a clean build had been failing)
 
 ### Security (see `SECURITY.md`)
