@@ -21,6 +21,8 @@ export default function BuildBoxPage({
 }: Props) {
   const {
     selectedPackaging,
+    selectedCover,
+    selectCover,
     selectPackaging,
     packagingQuantity,
     increasePackaging,
@@ -44,6 +46,8 @@ export default function BuildBoxPage({
           packagingOptions={packagingOptions}
           selectedPackaging={selectedPackaging}
           onSelect={selectPackaging}
+          selectedCover={selectedCover}
+          onSelectCover={selectCover}
         />
         <ProductCatalog
           products={products}
@@ -55,6 +59,9 @@ export default function BuildBoxPage({
 
       <OrderSummary
         selectedPackaging={selectedPackaging}
+        selectedCover={selectedCover}
+        needsCover={builder.needsCover}
+        setPackagingPrice={builder.setPackagingPrice}
         packagingQuantity={packagingQuantity}
         packagingPrice={packagingPrice}
         onIncreasePackaging={increasePackaging}

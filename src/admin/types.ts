@@ -74,7 +74,7 @@ export interface AdminProduct {
 export interface AdminPackaging {
   id: string;
   name: string;
-  kind: "box" | "jar";
+  kind: "box" | "jar" | "cover";
   description: string;
   price: number;
   slotCount: number;

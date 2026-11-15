@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum PackagingKind {
     BOX("box"),
-    JAR("jar");
+    JAR("jar"),
+    /** Outer cover of a glass jar set. Priced on its own and not sold by itself. */
+    COVER("cover");
 
     private final String wire;
 

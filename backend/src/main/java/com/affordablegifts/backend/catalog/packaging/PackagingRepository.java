@@ -8,4 +8,5 @@ public interface PackagingRepository extends JpaRepository<Packaging, String> {
     List<Packaging> findByActiveTrueOrderByDisplayOrderAscNameAsc();
 
     List<Packaging> findAllByOrderByDisplayOrderAscNameAsc();
+
 }

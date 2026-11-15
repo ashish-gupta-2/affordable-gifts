@@ -25,6 +25,8 @@ export interface PlaceOrderInput {
   /** Same id on every retry of one checkout, so a double submit is harmless. */
   requestId: string;
   packagingId: string;
+  /** Glass jars only: the outer cover chosen with them. */
+  coverId?: string;
   quantity: number;
   /** One product id per slot, in slot order. Prices are never sent. */
   productIds: string[];
@@ -39,6 +41,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlacedOrder> {
     body: JSON.stringify({
       requestId: input.requestId,
       packagingId: input.packagingId,
+      coverId: input.coverId,
       quantity: input.quantity,
       productIds: input.productIds,
       customer: {
